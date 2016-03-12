@@ -3,12 +3,10 @@ import edu.princeton.cs.algs4.In;
 import java.util.LinkedList;
 
 
-public class Board implements Comparable<Board>{
+public class Board {
 	private int[][] board;
-	public int moves;
-	public Board prevBoard;
 	private int dimension;
-	public int priority;
+	
 	
 	private int position(int row, int col)
 	{
@@ -18,25 +16,12 @@ public class Board implements Comparable<Board>{
 	
 	public Board(int [][]blocks)
 	{
-		this.board = blocks;
-		this.moves = 0;
-		this.prevBoard = null;
-		this.dimension = blocks[0].length;
-		this.priority = this.hamming();
+		this.board = blocks;		
+		this.dimension = blocks[0].length;		
 	}
 	
-	// ordering done only on priority.
-	public int compareTo(Board b)
-	{
-		double priority_B = b.priority;
-		
-		if (this.priority < priority_B)
-			return -1;
-		else if (this.priority > priority_B)
-			return 1;
-		else
-			return 0;
-	}
+	
+	
 	
 	public int dimension()
 	{
@@ -73,7 +58,7 @@ public class Board implements Comparable<Board>{
 				}
 			}
 		}
-		return blocksInWrongPosition+this.moves;
+		return blocksInWrongPosition;
 		
 	}
 	
@@ -90,7 +75,7 @@ public class Board implements Comparable<Board>{
 				}
 			}
 		}
-		return moves_required+this.moves;
+		return moves_required;
 	}
 	
 	public boolean isGoal()
@@ -139,6 +124,13 @@ public class Board implements Comparable<Board>{
 		int origin_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
 		int target_row = edu.princeton.cs.algs4.StdRandom.uniform(0,this.dimension);
 		int target_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
+		if (target_row == origin_row && target_col==origin_col)
+		{
+			if (target_col>0)
+				target_col-=1;
+			else
+				target_col+=1;
+		}
 		if (this.board[origin_row][origin_col]==0)
 		{
 			if (origin_row>0)
@@ -169,6 +161,8 @@ public class Board implements Comparable<Board>{
 			return false;
 		Board that = (Board) y;
 		boolean status = true;
+		if (that.dimension() != this.dimension())
+			return false;
 		for (int i = 0;i<this.dimension;i++)
 		{
 			for (int j = 0;j<this.dimension;j++)
@@ -204,9 +198,6 @@ public class Board implements Comparable<Board>{
 			Board up = this.sibling();
 			up.board[gap_row][gap_col]=up.board[gap_row-1][gap_col];
 			up.board[gap_row-1][gap_col]=0;
-			up.prevBoard = this;
-			up.moves = this.moves+1;
-			up.priority = up.hamming();
 			neighbors.add(up);
 		}
 		// can i move gap down , if yes move'
@@ -215,9 +206,6 @@ public class Board implements Comparable<Board>{
 			Board down = this.sibling();
 			down.board[gap_row][gap_col]=down.board[gap_row+1][gap_col];
 			down.board[gap_row+1][gap_col]=0;
-			down.prevBoard = this;
-			down.moves = this.moves+1;
-			down.priority = down.hamming();
 			neighbors.add(down);
 		}
 		// can i move gap left, if yes move
@@ -226,9 +214,6 @@ public class Board implements Comparable<Board>{
 			Board left = this.sibling();
 			left.board[gap_row][gap_col]=left.board[gap_row][gap_col-1];
 			left.board[gap_row][gap_col-1]=0;
-			left.prevBoard = this;
-			left.moves = this.moves+1;
-			left.priority = left.hamming();
 			neighbors.add(left);
 		}
 		// can i move right, if yes move
@@ -237,9 +222,6 @@ public class Board implements Comparable<Board>{
 			Board right = this.sibling();
 			right.board[gap_row][gap_col]=right.board[gap_row][gap_col+1];
 			right.board[gap_row][gap_col+1]=0;
-			right.prevBoard = this;
-			right.moves = this.moves+1;
-			right.priority = right.hamming();
 			neighbors.add(right);
 		}
 		

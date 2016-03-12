@@ -6,19 +6,48 @@ import edu.princeton.cs.algs4.MinPQ;
 import java.util.LinkedList;
 import java.util.Stack;
 public class Solver {
-	MinPQ<Board> pq_original = new MinPQ<Board>();
-	MinPQ<Board> pq_twin = new MinPQ<Board>();
-	Board original;
-	Board twin;
-	private Board solution;
+	private MinPQ<searchNode> pq_original = new MinPQ<searchNode>();
+	private MinPQ<searchNode> pq_twin = new MinPQ<searchNode>();
+	private searchNode original;
+	private searchNode twin;
+	private searchNode solution;
 	private Stack<Board> trace = new Stack<Board>();
+	private boolean solvable = false;
 	public Solver(Board initial)
 	{
-		original = initial;
-		twin = original.twin();
+		original = new searchNode(initial);
+		twin = new searchNode(initial.twin());
 		// put the original and twin boards in there respective queues
 		pq_original.insert(original);
 		pq_twin.insert(twin);
+	}
+	
+	private class searchNode implements Comparable<searchNode>
+	{
+		private Board board;
+		private searchNode prev;
+		private int moves;
+		private int priority;
+		
+		public searchNode(Board board)
+		{
+			this.board = board;
+			this.prev = null;
+			moves = 0;
+			priority = 0;
+		}
+		
+		public int compareTo(searchNode b)
+		{
+			double priority_B = b.priority;
+			
+			if (this.priority < priority_B)
+				return -1;
+			else if (this.priority > priority_B)
+				return 1;
+			else
+				return 0;
+		}
 	}
 	
 	public boolean isSolvable()
@@ -27,44 +56,55 @@ public class Solver {
 		 * do till the pq is empty or goal is reached
 		 * deque a item, if it is not goal
 		 * enque its siblings*/
-		Board fromOrig = pq_original.delMin();
-		Board fromTwin = pq_twin.delMin();
+		searchNode fromOrig = pq_original.delMin();
+		searchNode fromTwin = pq_twin.delMin();
 		//int counter = 0;
-		while(!fromOrig.isGoal() && !fromTwin.isGoal() /*&& counter < 5*/)
+		while(!fromOrig.board.isGoal() && !fromTwin.board.isGoal() /*&& counter < 5*/)
 		{
 			
 			//get list of siblings for original and put them in pq
-			for (Board board:fromOrig.neighbors())
+			for (Board board:fromOrig.board.neighbors())
 			{
-				//if (!board.equals(fromOrig.prevBoard))
+				if (fromOrig.prev==null || !board.equals(fromOrig.prev.board))
 				{
-					pq_original.insert(board);
+					searchNode temp = new searchNode(board);
+					temp.moves = fromOrig.moves+1;
+					temp.prev = fromOrig;
+					temp.priority = temp.board.manhattan()+temp.moves;
+					pq_original.insert(temp);
 				}
+			
 			}
 			//get list of siblings in twin and put them in pq
-			for (Board board:fromTwin.neighbors())
+			for ( Board board:fromTwin.board.neighbors())
 			{
-				//if (!board.equals(fromTwin.prevBoard))
+				if (fromTwin.prev == null || !board.equals(fromTwin.prev.board))
 				{
-					pq_twin.insert(board);
+					searchNode temp = new searchNode(board);
+					temp.moves = fromTwin.moves+1;
+					temp.prev = fromTwin;
+					temp.priority = temp.board.manhattan()+temp.moves;
+					pq_twin.insert(temp);
 				}
 			}
 			fromOrig = pq_original.delMin();
 			
 			fromTwin = pq_twin.delMin();
-			/*System.out.println(fromOrig.hamming());
+			/*System.out.println(fromOrig.manhattan());
 			System.out.println(fromOrig);
 			System.out.println("counter "+Integer.toString(counter));
 			counter++;*/
 		}
-		if (fromOrig.isGoal())
+		if (fromOrig.board.isGoal())
 			{
 				solution = fromOrig;
+				this.solvable = true;
 				return true;
 			}
 		else 
 			{
 			solution = null;
+			this.solvable = false;
 			return false;
 			}
 					
@@ -72,17 +112,29 @@ public class Solver {
 	
 	public int moves()
 	{
-		return solution.moves;
+	    if (solvable)
+	        return solution.moves;
+	    else if (this.isSolvable())
+		    return solution.moves;
+	    else
+	        return -1;
 	}
 	
 	public Iterable<Board> solution()
 	{
-		Board temp = solution;
-		trace.push(temp);
-		while (temp.prevBoard != null)
+	    
+		searchNode temp;
+         if (solvable)
+            temp = solution;           
+	     else if (this.isSolvable())
+		    temp = solution;
+         else
+            return null;
+		trace.push(temp.board);
+		while (temp.prev != null)
 		{
-			trace.push(temp.prevBoard);
-			temp = temp.prevBoard;
+			trace.push(temp.prev.board);
+			temp = temp.prev;
 		}
 		LinkedList<Board> ll = new LinkedList<Board>();
 		while (!trace.empty())
