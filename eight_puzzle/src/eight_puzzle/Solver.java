@@ -13,6 +13,7 @@ public class Solver {
 	private searchNode solution;
 	private Stack<Board> trace = new Stack<Board>();
 	private boolean solvable = false;
+	private boolean notSolvable = false;
 	public Solver(Board initial)
 	{
 		original = new searchNode(initial);
@@ -56,6 +57,10 @@ public class Solver {
 		 * do till the pq is empty or goal is reached
 		 * deque a item, if it is not goal
 		 * enque its siblings*/
+		 if (solvable==true)
+		    return true;
+         else if (this.notSolvable)
+            return false;
 		searchNode fromOrig = pq_original.delMin();
 		searchNode fromTwin = pq_twin.delMin();
 		//int counter = 0;
@@ -105,6 +110,7 @@ public class Solver {
 			{
 			solution = null;
 			this.solvable = false;
+			this.notSolvable = true;
 			return false;
 			}
 					
@@ -116,6 +122,8 @@ public class Solver {
 	        return solution.moves;
 	    else if (this.isSolvable())
 		    return solution.moves;
+	    else if (this.notSolvable)
+	        return -1;
 	    else
 	        return -1;
 	}
@@ -128,6 +136,8 @@ public class Solver {
             temp = solution;           
 	     else if (this.isSolvable())
 		    temp = solution;
+	    else if (this.notSolvable)
+	        return null;
          else
             return null;
 		trace.push(temp.board);

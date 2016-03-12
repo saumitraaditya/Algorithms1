@@ -16,7 +16,14 @@ public class Board {
 	
 	public Board(int [][]blocks)
 	{
-		this.board = blocks;		
+		this.board = new int[blocks.length][blocks[0].length];
+		for (int i = 0;i<blocks.length;i++)
+		{
+			for (int j = 0;j<blocks[0].length;j++)
+			{
+				this.board[i][j]=blocks[i][j];
+			}
+		}		
 		this.dimension = blocks[0].length;		
 	}
 	
@@ -119,8 +126,39 @@ public class Board {
 				clone[i][j]=this.board[i][j];
 			}
 		}
-		// swap a pair of blocks
 		int origin_row = edu.princeton.cs.algs4.StdRandom.uniform(0,this.dimension);
+		int origin_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
+		int target_row,target_col;
+		do
+		{
+			origin_row = edu.princeton.cs.algs4.StdRandom.uniform(0,this.dimension);
+			origin_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
+		}while(this.board[origin_row][origin_col]==0);
+		// can I swap with one at the top
+		if (origin_row > 0 && this.board[origin_row-1][origin_col]!=0)
+		{
+			target_row = origin_row-1;
+			target_col = origin_col;
+		}
+		//can I swap with one below
+		else if (origin_row < this.dimension()-1 && this.board[origin_row+1][origin_col]!=0)
+		{
+			target_row = origin_row+1;
+			target_col = origin_col;
+		}
+		// can I swap with one at left
+		else if (origin_col >0  && this.board[origin_row][origin_col-1]!=0)
+		{
+			target_row = origin_row;
+			target_col = origin_col-1;
+		}
+		else
+		{
+			target_row = origin_row;
+			target_col = origin_col+1;
+		}
+		// swap a pair of blocks
+		/*int origin_row = edu.princeton.cs.algs4.StdRandom.uniform(0,this.dimension);
 		int origin_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
 		int target_row = edu.princeton.cs.algs4.StdRandom.uniform(0,this.dimension);
 		int target_col = edu.princeton.cs.algs4.StdRandom.uniform(0, this.dimension);
@@ -144,7 +182,7 @@ public class Board {
 				target_row-=1;
 			else
 				target_row+=1;
-		}
+		}*/
 		// do the actual swap
 		int temp = clone[target_row][target_col];
 		clone[target_row][target_col] = clone[origin_row][origin_col];
@@ -269,4 +307,3 @@ public class Board {
 
 	
 	
-
