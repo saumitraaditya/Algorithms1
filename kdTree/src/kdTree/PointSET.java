@@ -7,7 +7,7 @@ import java.util.TreeSet;
 import java.util.ArrayList;
 public class PointSET {
 	
-	TreeSet<Point2D> T;
+	private TreeSet<Point2D> T;
 	public PointSET()
 	{
 		T = new TreeSet<Point2D>();
@@ -25,12 +25,14 @@ public class PointSET {
 	
 	public void insert(Point2D p)
 	{
+		if (p == null) throw new java.lang.NullPointerException();
 		T.add(p);
 	}
 	
 	public boolean contains(Point2D p)
 	{
-		return contains(p);
+		if (p == null) throw new java.lang.NullPointerException();
+		return T.contains(p);
 	}
 	
 	public void draw()
@@ -42,13 +44,14 @@ public class PointSET {
 		{
 			temp = I.next();
 			temp.draw();
-			System.out.println(temp);
+			//System.out.println(temp);
 		}
 	
 	}
 	
 	public Iterable<Point2D> range(RectHV rect)
 	{
+		if (rect == null) throw new java.lang.NullPointerException();
 		ArrayList<Point2D> A = new ArrayList<Point2D>();
 		Iterator<Point2D> I = T.iterator();
 		Point2D temp;
@@ -65,6 +68,7 @@ public class PointSET {
 	
 	public Point2D nearest(Point2D p)
 	{
+		if (p == null) throw new java.lang.NullPointerException();
 		Point2D nearest = null;
 		Point2D temp;
 		// safe assumption as out=r problem space is within a unit square.
