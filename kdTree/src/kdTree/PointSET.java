@@ -63,6 +63,7 @@ public class PointSET {
 				A.add(temp);
 			}
 		}
+		System.out.println("BRUTE FORCE RANGE SIZE: "+A.size());
 		return A;
 	}
 	
@@ -85,6 +86,7 @@ public class PointSET {
 				minDistance = Distance;
 			}
 		}
+		System.out.println("BRUTE Nearest-- "+nearest);
 		return nearest;
 	}
 	
